@@ -81,6 +81,10 @@ const signup = async (req, res) => {
       res.status(409).json({ message: 'User already exists' });
       return;
     }
+    if (err.code === 11000) {
+      // Duplicate key error (MongoDB unique index)
+      return res.status(400).json({ message: 'ID or Email already exists' });
+    }
 
     //This finction return promise to save user
     //await it then user will saved

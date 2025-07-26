@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState ,useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -8,11 +8,13 @@ const Login = () => {
     password: ''
   });
   const [message, setMessage] = useState('');
+  const location = useLocation();
+  const RegistrationMessage = location.state?.message;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -25,7 +27,9 @@ const Login = () => {
       setMessage(data.message);
       if (data.token) {
         localStorage.setItem('token', data.token);
-        // Optionally redirect to dashboard
+        navigate('/', { state: { message: 'Login successful' } });
+      } else {
+        setMessage(data.message || 'Login failed');
       }
     } catch (err) {
       setMessage('Login failed');
@@ -34,6 +38,9 @@ const Login = () => {
   return (
     <div className='container mt-5' style={{ maxWidth: '500px' }}>
       <h2 className='text-center mb-4'>Login</h2>
+      {RegistrationMessage && <div className='alert alert-success mt-3'>{RegistrationMessage}</div>}
+      {message && <div className='alert alert-danger mt-3'>{message}</div>}
+
       <form onSubmit={handleSubmit}>
         {/* Role selection */}
         <div className='mb-3'>
@@ -86,9 +93,6 @@ const Login = () => {
           Login
         </button>
       </form>
-
-      {/* Message */}
-      {message && <div className='alert alert-info mt-3'>{message}</div>}
 
       <div className='mt-3 text-center'>
         <span>Don't have an account? </span>
